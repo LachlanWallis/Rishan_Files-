@@ -19,7 +19,6 @@ body {
   transition: background 1s ease, color 1s ease;
 }
 
-/* LIVE text */
 .live {
   position: absolute;
   top: 30px;
@@ -64,7 +63,6 @@ h1 {
   opacity: 0.6;
 }
 
-/* SHAKE */
 @keyframes shake {
   0% { transform: translate(0,0); }
   25% { transform: translate(2px,-2px); }
@@ -73,7 +71,6 @@ h1 {
   100% { transform: translate(-2px,-2px); }
 }
 
-/* GLITCH */
 @keyframes glitch {
   0% { filter:none; }
   20% { filter:contrast(2) hue-rotate(90deg); }
@@ -83,7 +80,6 @@ h1 {
   100% { filter:invert(1); }
 }
 
-/* FLICKER */
 @keyframes flicker {
   0% { opacity:1; }
   50% { opacity:0.2; }
@@ -123,7 +119,6 @@ let heartbeatPlayed = false;
 let glitchActive = false;
 let switched = false;
 
-/* SAME weekly logic */
 function getTargetDate() {
   const now = new Date();
   const day = now.getDay();
@@ -135,9 +130,9 @@ function getTargetDate() {
   return nextFriday;
 }
 
-/* SECRET SKIP */
+/* SECRET SKIP — Shift + Command + 8 */
 document.addEventListener("keydown", function(e){
-  if((e.metaKey || e.ctrlKey) && e.key==="6"){
+  if(e.metaKey && e.shiftKey && e.key === "8"){
     let newTarget = new Date();
     newTarget.setSeconds(newTarget.getSeconds()+10);
     targetDate = newTarget;
@@ -168,7 +163,6 @@ function updateCountdown(){
   document.getElementById("minutes").innerText = minutes;
   document.getElementById("seconds").innerText = seconds;
 
-  /* SMOOTH GREY → RED */
   const maxTime = 1000 * 60 * 60 * 24 * 30;
   let progress = 1 - (difference / maxTime);
   if(progress < 0) progress = 0;
@@ -182,21 +176,18 @@ function updateCountdown(){
     n.style.color = `rgb(${red},${gb},${gb})`;
   });
 
-  /* SHAKE last 60 sec */
   if(difference <= 60000){
     document.querySelectorAll(".box").forEach(b=>{
       b.style.animation="shake 0.3s infinite";
     });
   }
 
-  /* HEARTBEAT at 30 sec */
   if(difference <= 30000 && !heartbeatPlayed){
     const audio = new Audio("https://www.soundjay.com/heartbeat/heartbeat-01.mp3");
     audio.play();
     heartbeatPlayed = true;
   }
 
-  /* GLITCH at 10 sec */
   if(difference <= 10000 && !glitchActive){
     document.body.style.animation="glitch 0.5s infinite";
     glitchActive = true;

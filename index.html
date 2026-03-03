@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>RISHAN FILES</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  background: #1c1c1c;
+  color: rgb(180,180,180);
+  font-family: 'Montserrat', sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  transition: background 1s ease, color 1s ease;
+}
+
+/* LIVE text */
+.live {
+  position: absolute;
+  top: 30px;
+  font-size: 0.7rem;
+  letter-spacing: 3px;
+  color: #ff3b3b;
+  opacity: 0.7;
+}
+
+h1 {
+  font-size: 3.5rem;
+  letter-spacing: 12px;
+  margin-bottom: 70px;
+  font-weight: 800;
+  opacity: 0.9;
+}
+
+.countdown {
+  display: flex;
+  gap: 30px;
+}
+
+.box {
+  background: #2a2a2a;
+  padding: 35px 45px;
+  border-radius: 6px;
+  text-align: center;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+  transition: transform 0.3s ease;
+}
+
+.number {
+  font-size: 3rem;
+  font-weight: 800;
+  transition: color 1s linear;
+}
+
+.label {
+  font-size: 0.7rem;
+  letter-spacing: 3px;
+  margin-top: 10px;
+  opacity: 0.6;
+}
+
+/* SHAKE */
+@keyframes shake {
+  0% { transform: translate(0,0); }
+  25% { transform: translate(2px,-2px); }
+  50% { transform: translate(-2px,2px); }
+  75% { transform: translate(2px,2px); }
+  100% { transform: translate(-2px,-2px); }
+}
+
+/* GLITCH */
+@keyframes glitch {
+  0% { filter:none; }
+  20% { filter:contrast(2) hue-rotate(90deg); }
+  40% { filter:none; }
+  60% { filter:brightness(2); }
+  80% { filter:none; }
+  100% { filter:invert(1); }
+}
+
+/* FLICKER */
+@keyframes flicker {
+  0% { opacity:1; }
+  50% { opacity:0.2; }
+  100% { opacity:1; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="live">● LIVE</div>
+<h1>R I S H A N&nbsp;&nbsp;F I L E S</h1>
+
+<div class="countdown">
+  <div class="box">
+    <div class="number" id="days">00</div>
+    <div class="label">DAYS</div>
+  </div>
+  <div class="box">
+    <div class="number" id="hours">00</div>
+    <div class="label">HOURS</div>
+  </div>
+  <div class="box">
+    <div class="number" id="minutes">00</div>
+    <div class="label">MINUTES</div>
+  </div>
+  <div class="box">
+    <div class="number" id="seconds">00</div>
+    <div class="label">SECONDS</div>
+  </div>
+</div>
+
+<script>
+
+let targetDate = getTargetDate();
+let heartbeatPlayed = false;
+let glitchActive = false;
+let switched = false;
+
+/* SAME weekly logic */
+function getTargetDate() {
+  const now = new Date();
+  const day = now.getDay();
+  const daysUntilFriday = (5 - day + 7) % 7 || 7;
+  const nextFriday = new Date(now);
+  nextFriday.setDate(now.getDate() + daysUntilFriday);
+  nextFriday.setDate(nextFriday.getDate() + 21);
+  nextFriday.setHours(0,0,0,0);
+  return nextFriday;
+}
+
+/* SECRET SKIP */
+document.addEventListener("keydown", function(e){
+  if((e.metaKey || e.ctrlKey) && e.key==="6"){
+    let newTarget = new Date();
+    newTarget.setSeconds(newTarget.getSeconds()+10);
+    targetDate = newTarget;
+  }
+});
+
+function updateCountdown(){
+
+  const now = new Date();
+  const difference = targetDate - now;
+
+  if(difference <= 0 && !switched){
+    switched = true;
+    document.body.style.animation="flicker 0.15s infinite";
+    setTimeout(()=>{
+      window.location.href="files.html";
+    },1000);
+    return;
+  }
+
+  const days = Math.floor(difference / (1000*60*60*24));
+  const hours = Math.floor((difference / (1000*60*60)) % 24);
+  const minutes = Math.floor((difference / (1000*60)) % 60);
+  const seconds = Math.floor((difference / 1000) % 60);
+
+  document.getElementById("days").innerText = days;
+  document.getElementById("hours").innerText = hours;
+  document.getElementById("minutes").innerText = minutes;
+  document.getElementById("seconds").innerText = seconds;
+
+  /* SMOOTH GREY → RED */
+  const maxTime = 1000 * 60 * 60 * 24 * 30;
+  let progress = 1 - (difference / maxTime);
+  if(progress < 0) progress = 0;
+  if(progress > 1) progress = 1;
+
+  const red = Math.floor(255 * progress);
+  const gb = Math.floor(180 - (180 * progress));
+
+  const numbers = document.querySelectorAll(".number");
+  numbers.forEach(n=>{
+    n.style.color = `rgb(${red},${gb},${gb})`;
+  });
+
+  /* SHAKE last 60 sec */
+  if(difference <= 60000){
+    document.querySelectorAll(".box").forEach(b=>{
+      b.style.animation="shake 0.3s infinite";
+    });
+  }
+
+  /* HEARTBEAT at 30 sec */
+  if(difference <= 30000 && !heartbeatPlayed){
+    const audio = new Audio("https://www.soundjay.com/heartbeat/heartbeat-01.mp3");
+    audio.play();
+    heartbeatPlayed = true;
+  }
+
+  /* GLITCH at 10 sec */
+  if(difference <= 10000 && !glitchActive){
+    document.body.style.animation="glitch 0.5s infinite";
+    glitchActive = true;
+  }
+}
+
+setInterval(updateCountdown,1000);
+updateCountdown();
+
+</script>
+
+</body>
+</html>

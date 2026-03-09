@@ -121,12 +121,14 @@ let switched = false;
 
 function getTargetDate() {
   const now = new Date();
-  const day = now.getDay();
-  const daysUntilFriday = (5 - day + 7) % 7 || 7;
+  const day = now.getDay(); // 0 = Sunday, 5 = Friday
+  let daysUntilFriday = (5 - day + 7) % 7; // how many days until Friday
+  if(daysUntilFriday === 0 && now.getHours() >= 16) {
+    daysUntilFriday = 7; // if it's Friday past 4 PM, go to next Friday
+  }
   const nextFriday = new Date(now);
   nextFriday.setDate(now.getDate() + daysUntilFriday);
-  nextFriday.setDate(nextFriday.getDate() + 21);
-  nextFriday.setHours(0,0,0,0);
+  nextFriday.setHours(16, 0, 0, 0); // 16:00 = 4 PM
   return nextFriday;
 }
 
